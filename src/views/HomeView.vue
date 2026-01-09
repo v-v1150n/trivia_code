@@ -31,6 +31,14 @@
         <!-- 控制按鈕 -->
         <div class="card-controls">
           <button 
+            v-if="store.hasPrev"
+            class="btn btn-icon btn-secondary" 
+            @click="store.prevKnowledge"
+          >
+            ⏮️
+          </button>
+
+          <button 
             v-if="store.hasNext"
             class="btn btn-icon btn-secondary" 
             @click="handleNext"
@@ -60,9 +68,9 @@
 
     <!-- 底部導航 -->
     <nav class="bottom-nav">
-      <router-link to="/" class="nav-item" :class="{ active: $route.path === '/' }">
+      <router-link to="/explore" class="nav-item" :class="{ active: $route.path === '/explore' }">
         <span class="nav-icon">🏠</span>
-        <span class="nav-label">首頁</span>
+        <span class="nav-label">探索</span>
       </router-link>
       <router-link to="/favorites" class="nav-item" :class="{ active: $route.path === '/favorites' }">
         <span class="nav-icon">❤️</span>

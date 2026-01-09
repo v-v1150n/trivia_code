@@ -117,6 +117,13 @@ export const useKnowledgeStore = defineStore('knowledge', () => {
         }
     }
 
+    // 上一則
+    const prevKnowledge = () => {
+        if (currentIndex.value > 0) {
+            currentIndex.value--
+        }
+    }
+
     // 當前冷知識
     const currentKnowledge = computed(() => {
         return knowledgeList.value[currentIndex.value] || null
@@ -126,6 +133,9 @@ export const useKnowledgeStore = defineStore('knowledge', () => {
     const hasNext = computed(() => {
         return currentIndex.value < knowledgeList.value.length - 1
     })
+
+    // 是否還有上一則
+    const hasPrev = computed(() => currentIndex.value > 0)
 
     // 初始化
     loadFavorites()
@@ -142,11 +152,13 @@ export const useKnowledgeStore = defineStore('knowledge', () => {
         // 計算屬性
         currentKnowledge,
         hasNext,
+        hasPrev,
 
         // 方法
         fetchKnowledge,
         fetchTrendingTopics,
         nextKnowledge,
+        prevKnowledge,
         addToFavorites,
         removeFromFavorites,
         isFavorite

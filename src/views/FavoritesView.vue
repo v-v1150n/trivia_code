@@ -51,9 +51,9 @@
 
     <!-- 底部導航 -->
     <nav class="bottom-nav">
-      <router-link to="/" class="nav-item" :class="{ active: $route.path === '/' }">
+      <router-link to="/explore" class="nav-item" :class="{ active: $route.path === '/explore' }">
         <span class="nav-icon">🏠</span>
-        <span class="nav-label">首頁</span>
+        <span class="nav-label">探索</span>
       </router-link>
       <router-link to="/favorites" class="nav-item" :class="{ active: $route.path === '/favorites' }">
         <span class="nav-icon">❤️</span>
