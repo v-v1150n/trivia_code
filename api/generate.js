@@ -32,7 +32,7 @@ export default async function handler(req, res) {
     }
 
     try {
-        const { keywords = '', count = 1 } = req.body
+        const { keywords = '', count = 3 } = req.body
 
         const apiKey = process.env.GEMINI_API_KEY
         if (!apiKey) {
@@ -59,26 +59,20 @@ ${SYSTEM_PROMPT}
       "content": "冷知識內容，50-80字，極度精簡有趣",
       "whyInteresting": "一句話解釋笑點",
       "icebreaker": "一句開場白",
-      "quiz": "一個問題",
-      "sourceName": "網站名",
-      "sourceUrl": "URL"
+      "quiz": "一個問題"
     }
   ]
 }
 
 重要規則：
 1. 只回傳 JSON，不要其他文字
-2. 資訊來源必須是可訪問的原始網址（如 wikipedia.org, bbc.com）
-3. 不要使用 Google 重定向連結
-4. 語氣要像在跟朋友聊天
+2. 內容要真實有趣
+3. 語氣要像在跟朋友聊天
 `
 
         const response = await ai.models.generateContent({
             model: 'gemini-2.5-flash',
-            contents: prompt,
-            config: {
-                tools: [{ googleSearch: {} }]
-            }
+            contents: prompt
         })
 
         // 解析 JSON

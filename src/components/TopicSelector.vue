@@ -107,9 +107,10 @@ const loadTrending = async () => {
   await store.fetchTrendingTopics()
 }
 
-// 選擇話題
+// 選擇話題並直接搜尋
 const selectTopic = (topic) => {
   selectedTopic.value = topic
+  emit('search', topic)
 }
 
 // 搜尋

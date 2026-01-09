@@ -46,7 +46,7 @@ export const useKnowledgeStore = defineStore('knowledge', () => {
     }
 
     // 取得冷知識
-    const fetchKnowledge = async (keywords = '', count = 1) => {
+    const fetchKnowledge = async (keywords = '', count = 3) => {
         isLoading.value = true
         error.value = null
 

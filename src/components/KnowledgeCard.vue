@@ -1,13 +1,5 @@
 <template>
-  <div 
-    class="knowledge-card"
-    :class="{ 'is-swiping': isSwiping, 'swipe-left': swipeDirection === 'left', 'swipe-right': swipeDirection === 'right' }"
-    :style="cardStyle"
-    @touchstart="onTouchStart"
-    @touchmove="onTouchMove"
-    @touchend="onTouchEnd"
-    @mousedown="onMouseDown"
-  >
+  <div class="knowledge-card">
     <!-- 卡片頂部 -->
     <div class="card-header">
       <span class="card-category">{{ knowledge.category }}</span>
@@ -62,11 +54,7 @@
       <span v-else class="source-name">{{ knowledge.sourceName }}</span>
     </div>
 
-    <!-- 滑動提示 -->
-    <div class="swipe-hints">
-      <span class="hint hint-left">👈 下一則</span>
-      <span class="hint hint-right">收藏 👉</span>
-    </div>
+
   </div>
 </template>
 
@@ -81,31 +69,12 @@ const props = defineProps({
   }
 })
 
-const emit = defineEmits(['swipe-left', 'swipe-right'])
+const emit = defineEmits([])
 
 const store = useKnowledgeStore()
 
-// 滑動狀態
-const isSwiping = ref(false)
-const startX = ref(0)
-const currentX = ref(0)
-const swipeDirection = ref(null)
-
 // 是否已收藏
 const isFavorited = computed(() => store.isFavorite(props.knowledge.id))
-
-// 卡片樣式
-const cardStyle = computed(() => {
-  if (!isSwiping.value) return {}
-  
-  const deltaX = currentX.value - startX.value
-  const rotation = deltaX * 0.05
-  
-  return {
-    transform: `translateX(${deltaX}px) rotate(${rotation}deg)`,
-    transition: 'none'
-  }
-})
 
 // 切換收藏
 const toggleFavorite = () => {
@@ -114,80 +83,6 @@ const toggleFavorite = () => {
   } else {
     store.addToFavorites(props.knowledge)
   }
-}
-
-// 觸控事件
-const onTouchStart = (e) => {
-  startX.value = e.touches[0].clientX
-  isSwiping.value = true
-}
-
-const onTouchMove = (e) => {
-  if (!isSwiping.value) return
-  currentX.value = e.touches[0].clientX
-  
-  const deltaX = currentX.value - startX.value
-  if (deltaX > 50) {
-    swipeDirection.value = 'right'
-  } else if (deltaX < -50) {
-    swipeDirection.value = 'left'
-  } else {
-    swipeDirection.value = null
-  }
-}
-
-const onTouchEnd = () => {
-  handleSwipeEnd()
-}
-
-// 滑鼠事件
-const onMouseDown = (e) => {
-  startX.value = e.clientX
-  isSwiping.value = true
-  
-  const onMouseMove = (e) => {
-    currentX.value = e.clientX
-    
-    const deltaX = currentX.value - startX.value
-    if (deltaX > 50) {
-      swipeDirection.value = 'right'
-    } else if (deltaX < -50) {
-      swipeDirection.value = 'left'
-    } else {
-      swipeDirection.value = null
-    }
-  }
-  
-  const onMouseUp = () => {
-    handleSwipeEnd()
-    document.removeEventListener('mousemove', onMouseMove)
-    document.removeEventListener('mouseup', onMouseUp)
-  }
-  
-  document.addEventListener('mousemove', onMouseMove)
-  document.addEventListener('mouseup', onMouseUp)
-}
-
-// 處理滑動結束
-const handleSwipeEnd = () => {
-  const deltaX = currentX.value - startX.value
-  
-  if (deltaX > 100) {
-    // 右滑 - 收藏
-    if (!isFavorited.value) {
-      store.addToFavorites(props.knowledge)
-    }
-    emit('swipe-right')
-  } else if (deltaX < -100) {
-    // 左滑 - 下一則
-    emit('swipe-left')
-  }
-  
-  // 重置狀態
-  isSwiping.value = false
-  currentX.value = 0
-  startX.value = 0
-  swipeDirection.value = null
 }
 </script>
 

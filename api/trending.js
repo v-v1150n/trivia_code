@@ -30,9 +30,9 @@ export default async function handler(req, res) {
 - 社群媒體熱門話題
 - 新聞熱點
 
-請回傳 3-5 個熱門關鍵字，以 JSON 格式：
+請回傳 5 個熱門關鍵字，以 JSON 格式：
 {
-  "topics": ["關鍵字1", "關鍵字2", "關鍵字3"]
+  "topics": ["關鍵字1", "關鍵字2", "關鍵字3", "關鍵字4", "關鍵字5"]
 }
 
 只回傳 JSON，不要其他內容。
