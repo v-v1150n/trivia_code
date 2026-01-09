@@ -59,7 +59,9 @@ ${SYSTEM_PROMPT}
       "content": "冷知識內容，120-150字，內容要豐富具體，生動有趣",
       "whyInteresting": "一句話解釋笑點",
       "icebreaker": "一句開場白",
-      "quiz": "一個問題"
+      "quiz": "一個問題",
+      "sourceName": "資料來源 (例如: 維基百科 / Google)",
+      "sourceUrl": "具體連結 (若不確定，請回傳 https://www.google.com/search?q={標題} )"
     }
   ]
 }
@@ -76,7 +78,7 @@ ${SYSTEM_PROMPT}
         })
 
         // 解析 JSON
-        let text = response.text
+        let text = response.text().replace(/```json/g, '').replace(/```/g, '') // Cleanup markdown code blocks if any
 
         // 嘗試提取 JSON
         const jsonMatch = text.match(/\{[\s\S]*\}/)

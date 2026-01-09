@@ -110,15 +110,13 @@ const loadTrending = async () => {
 // 選擇話題並直接搜尋
 const selectTopic = (topic) => {
   selectedTopic.value = topic
-  emit('search', topic)
+  emit('search', topic, 'trending')
 }
 
 // 搜尋
 const search = () => {
-  const keywords = mode.value === 'trending' ? selectedTopic.value : customKeywords.value
-  if (keywords || mode.value === 'custom') {
-    emit('search', keywords)
-  }
+  if (!customKeywords.value.trim()) return
+  emit('search', customKeywords.value, 'keyword')
 }
 
 // 隨機搜尋

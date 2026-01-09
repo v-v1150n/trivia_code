@@ -2,7 +2,9 @@
   <div class="home-view">
     <!-- Header -->
     <header class="header">
-      <h1 class="logo">🧊 冷知識</h1>
+      <router-link to="/" class="header-link">
+        <h1 class="logo">🧊 冷知識</h1>
+      </router-link>
       <p class="tagline">探索有趣的世界</p>
     </header>
 
@@ -11,7 +13,10 @@
       <!-- 載入中 -->
       <div v-if="store.isLoading" class="loading-state">
         <div class="loading-content">
-          <div class="cube-wrapper">
+          <div v-if="loadingType === 'keyword'" class="search-anim-wrapper">
+             <span class="search-icon-anim">🔍</span>
+          </div>
+          <div v-else class="cube-wrapper">
             <div class="cube"></div>
           </div>
           <p class="loading-text">{{ currentLoadingText }}</p>
@@ -84,7 +89,7 @@
       <div v-if="showSelector" class="modal-overlay" @click.self="showSelector = false">
         <div class="modal-content">
           <button class="modal-close" @click="showSelector = false">✕</button>
-          <TopicSelector @search="(k) => { handleSearch(k); showSelector = false; }" />
+          <TopicSelector @search="(k, t) => { handleSearch(k, t); showSelector = false; }" />
         </div>
       </div>
     </Transition>
@@ -100,6 +105,7 @@ import TopicSelector from '../components/TopicSelector.vue'
 const store = useKnowledgeStore()
 const showSelector = ref(false)
 const currentLoadingText = ref('正在探索冷知識...')
+const loadingType = ref('trending')
 let loadingInterval = null
 
 // 是否收藏當前
@@ -147,7 +153,8 @@ const stopLoadingAnimation = () => {
 }
 
 // 搜尋
-const handleSearch = async (keywords) => {
+const handleSearch = async (keywords, type = 'trending') => {
+  loadingType.value = type
   startLoadingAnimation()
   try {
     store.knowledgeList = [] // 清空舊的
@@ -443,5 +450,29 @@ const handleNext = () => {
 .modal-enter-from,
 .modal-leave-to {
   opacity: 0;
+}
+
+/* Header Link */
+.header-link {
+  text-decoration: none;
+  color: inherit;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.header-link:hover {
+  opacity: 0.8;
+}
+
+/* Search Animation */
+.search-anim-wrapper {
+  font-size: 60px;
+  animation: bounce 1s infinite;
+  margin-bottom: var(--spacing-md);
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-20px); }
 }
 </style>
