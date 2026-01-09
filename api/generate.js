@@ -78,7 +78,7 @@ ${SYSTEM_PROMPT}
         })
 
         // 解析 JSON
-        let text = response.text().replace(/```json/g, '').replace(/```/g, '') // Cleanup markdown code blocks if any
+        let text = response.text.replace(/```json/g, '').replace(/```/g, '') // Cleanup markdown code blocks if any
 
         // 嘗試提取 JSON
         const jsonMatch = text.match(/\{[\s\S]*\}/)
