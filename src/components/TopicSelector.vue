@@ -5,14 +5,14 @@
       <button 
         class="tab" 
         :class="{ active: mode === 'trending' }"
-        @click="mode = 'trending'"
+        @click="switchMode('trending')"
       >
         📈 今日熱門
       </button>
       <button 
         class="tab" 
         :class="{ active: mode === 'custom' }"
-        @click="mode = 'custom'"
+        @click="switchMode('custom')"
       >
         ✏️ 自訂關鍵字
       </button>
@@ -92,7 +92,7 @@ const emit = defineEmits(['search'])
 
 const store = useKnowledgeStore()
 
-const mode = ref('trending')
+const mode = ref('custom')
 const selectedTopic = ref('')
 const customKeywords = ref('')
 
@@ -119,12 +119,14 @@ const randomSearch = () => {
   emit('search', '')
 }
 
-// 載入時取得熱門話題
-onMounted(() => {
-  if (!store.trendingTopics.length) {
+// 切換模式
+const switchMode = (newMode) => {
+  mode.value = newMode
+  
+  if (newMode === 'trending' && !store.trendingTopics.length) {
     loadTrending()
   }
-})
+}
 </script>
 
 <style scoped>
