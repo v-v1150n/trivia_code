@@ -15,6 +15,7 @@
           v-for="item in store.favorites" 
           :key="item.id" 
           class="favorite-item"
+          @click="viewDetail(item)"
         >
           <div class="item-header">
             <span class="item-category">{{ item.category }}</span>
@@ -67,17 +68,39 @@
         {{ toastMessage }}
       </div>
     </Transition>
+
+    <!-- 詳情 Modal -->
+    <Transition name="modal">
+      <div v-if="selectedFavorite" class="modal-overlay" @click.self="closeDetail">
+        <div class="detail-modal-content">
+          <button class="modal-close" @click="closeDetail">✕</button>
+          <KnowledgeCard :knowledge="selectedFavorite" />
+        </div>
+      </div>
+    </Transition>
   </div>
 </template>
 
 <script setup>
 import { ref } from 'vue'
 import { useKnowledgeStore } from '../stores/knowledge'
+import KnowledgeCard from '../components/KnowledgeCard.vue'
 
 const store = useKnowledgeStore()
 
 const showToast = ref(false)
 const toastMessage = ref('')
+const selectedFavorite = ref(null)
+
+// 查看詳情
+const viewDetail = (item) => {
+  selectedFavorite.value = item
+}
+
+// 關閉詳情
+const closeDetail = () => {
+  selectedFavorite.value = null
+}
 
 // 移除收藏
 const removeFavorite = (id) => {
@@ -203,6 +226,7 @@ const formatDate = (dateString) => {
   color: var(--text-secondary);
   display: -webkit-box;
   -webkit-line-clamp: 3;
+  line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -337,5 +361,54 @@ const formatDate = (dateString) => {
 .toast-leave-to {
   opacity: 0;
   transform: translateX(-50%) translateY(20px);
+}
+
+/* 詳情 Modal */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: var(--spacing-md);
+}
+
+.detail-modal-content {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+.modal-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 32px;
+  height: 32px;
+  background: rgba(0, 0, 0, 0.5);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-full);
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.modal-enter-active,
+.modal-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.modal-enter-from,
+.modal-leave-to {
+  opacity: 0;
 }
 </style>

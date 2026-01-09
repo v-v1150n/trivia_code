@@ -8,37 +8,47 @@
 
     <!-- 主內容區 -->
     <main class="main-content">
-      <!-- 顯示卡片 -->
-      <div v-if="store.currentKnowledge" class="card-container">
-        <Transition name="card" mode="out-in">
-          <KnowledgeCard 
-            :key="store.currentKnowledge.id"
-            :knowledge="store.currentKnowledge"
-            @swipe-left="handleNext"
-            @swipe-right="handleNext"
-          />
-        </Transition>
-        
-        <!-- 控制按鈕 -->
-        <div class="card-controls">
-          <button class="btn btn-icon btn-secondary" @click="handleNext" :disabled="!store.hasNext">
-            ⏭️
-          </button>
-          <button class="btn btn-icon btn-primary" @click="showSelector = true">
-            🔍
-          </button>
-        </div>
-      </div>
-
       <!-- 載入中 -->
-      <!-- 載入中 -->
-      <div v-else-if="store.isLoading" class="loading-state">
+      <div v-if="store.isLoading" class="loading-state">
         <div class="loading-content">
           <div class="cube-wrapper">
             <div class="cube"></div>
           </div>
           <p class="loading-text">{{ currentLoadingText }}</p>
           <div class="loading-progress"></div>
+        </div>
+      </div>
+
+      <!-- 顯示卡片 -->
+      <div v-else-if="store.currentKnowledge" class="card-container">
+        <Transition name="card" mode="out-in">
+          <KnowledgeCard 
+            :key="store.currentKnowledge.id"
+            :knowledge="store.currentKnowledge"
+          />
+        </Transition>
+        
+        <!-- 控制按鈕 -->
+        <div class="card-controls">
+          <button 
+            v-if="store.hasNext"
+            class="btn btn-icon btn-secondary" 
+            @click="handleNext"
+          >
+            ⏭️
+          </button>
+          
+          <button 
+            class="btn btn-icon btn-favorite-control"
+            :class="{ 'is-active': isCurrentFavorited }"
+            @click="toggleCurrentFavorite"
+          >
+            {{ isCurrentFavorited ? '❤️' : '🤍' }}
+          </button>
+
+          <button class="btn btn-icon btn-primary" @click="showSelector = true">
+            🔍
+          </button>
         </div>
       </div>
 
@@ -74,7 +84,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { useKnowledgeStore } from '../stores/knowledge'
 import KnowledgeCard from '../components/KnowledgeCard.vue'
 import TopicSelector from '../components/TopicSelector.vue'
@@ -83,6 +93,22 @@ const store = useKnowledgeStore()
 const showSelector = ref(false)
 const currentLoadingText = ref('正在探索冷知識...')
 let loadingInterval = null
+
+// 是否收藏當前
+const isCurrentFavorited = computed(() => {
+  return store.currentKnowledge && store.isFavorite(store.currentKnowledge.id)
+})
+
+// 切換當前收藏
+const toggleCurrentFavorite = () => {
+  if (!store.currentKnowledge) return
+  
+  if (isCurrentFavorited.value) {
+    store.removeFromFavorites(store.currentKnowledge.id)
+  } else {
+    store.addToFavorites(store.currentKnowledge)
+  }
+}
 
 const loadingTexts = [
   '正在翻閱百科全書...',
@@ -116,7 +142,8 @@ const stopLoadingAnimation = () => {
 const handleSearch = async (keywords) => {
   startLoadingAnimation()
   try {
-    await store.fetchKnowledge(keywords, 1)
+    store.knowledgeList = [] // 清空舊的
+    await store.fetchKnowledge(keywords, 3) // 確保是 3 則
   } finally {
     stopLoadingAnimation()
   }
@@ -179,8 +206,35 @@ const handleNext = () => {
 .card-controls {
   display: flex;
   justify-content: center;
+  align-items: center;
   gap: var(--spacing-md);
   margin-top: var(--spacing-lg);
+}
+
+.btn-favorite-control {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-full);
+  background: var(--bg-card);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-secondary);
+  font-size: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.btn-favorite-control:active {
+  transform: scale(0.9);
+}
+
+.btn-favorite-control.is-active {
+  color: var(--accent-danger);
+  border-color: var(--accent-danger);
+  background: rgba(239, 68, 68, 0.1);
+  animation: heartbeat 0.3s ease;
 }
 
 .loading-state {
