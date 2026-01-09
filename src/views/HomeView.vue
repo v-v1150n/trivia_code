@@ -31,9 +31,15 @@
       </div>
 
       <!-- 載入中 -->
+      <!-- 載入中 -->
       <div v-else-if="store.isLoading" class="loading-state">
-        <div class="loading-spinner">🧊</div>
-        <p>正在探索冷知識...</p>
+        <div class="loading-content">
+          <div class="cube-wrapper">
+            <div class="cube"></div>
+          </div>
+          <p class="loading-text">{{ currentLoadingText }}</p>
+          <div class="loading-progress"></div>
+        </div>
       </div>
 
       <!-- 選擇主題 -->
@@ -75,10 +81,45 @@ import TopicSelector from '../components/TopicSelector.vue'
 
 const store = useKnowledgeStore()
 const showSelector = ref(false)
+const currentLoadingText = ref('正在探索冷知識...')
+let loadingInterval = null
+
+const loadingTexts = [
+  '正在翻閱百科全書...',
+  '正在聯繫外星人...',
+  '正在計算宇宙的終極答案...',
+  '正在請教 Einstein...',
+  '正在尋找失落的文明...',
+  '正在喝杯咖啡提提神...',
+  '正在把冰塊敲碎...',
+]
+
+// 啟動載入動畫
+const startLoadingAnimation = () => {
+  let index = 0
+  currentLoadingText.value = loadingTexts[0]
+  loadingInterval = setInterval(() => {
+    index = (index + 1) % loadingTexts.length
+    currentLoadingText.value = loadingTexts[index]
+  }, 2000)
+}
+
+// 停止載入動畫
+const stopLoadingAnimation = () => {
+  if (loadingInterval) {
+    clearInterval(loadingInterval)
+    loadingInterval = null
+  }
+}
 
 // 搜尋
 const handleSearch = async (keywords) => {
-  await store.fetchKnowledge(keywords, 1)
+  startLoadingAnimation()
+  try {
+    await store.fetchKnowledge(keywords, 1)
+  } finally {
+    stopLoadingAnimation()
+  }
 }
 
 // 下一則
@@ -143,18 +184,73 @@ const handleNext = () => {
 }
 
 .loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 300px;
+  width: 100%;
+}
+
+.loading-content {
   text-align: center;
-  color: var(--text-secondary);
+  animation: fadeIn 0.5s ease;
 }
 
-.loading-spinner {
-  font-size: 48px;
-  animation: bounce 1s infinite;
+.cube-wrapper {
+  perspective: 400px;
+  margin-bottom: var(--spacing-xl);
 }
 
-@keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+.cube {
+  width: 50px;
+  height: 50px;
+  background: var(--primary);
+  transform-style: preserve-3d;
+  animation: rotate 2s infinite linear;
+  box-shadow: 0 0 20px var(--primary-glow);
+}
+
+.loading-text {
+  color: var(--text-primary);
+  font-size: 16px;
+  min-height: 24px;
+  margin-bottom: var(--spacing-md);
+  font-weight: 500;
+}
+
+.loading-progress {
+  width: 150px;
+  height: 3px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 3px;
+  overflow: hidden;
+  margin: 0 auto;
+}
+
+.loading-progress::after {
+  content: '';
+  display: block;
+  width: 50%;
+  height: 100%;
+  background: var(--primary);
+  border-radius: 3px;
+  animation: slide 1.5s infinite ease-in-out;
+}
+
+@keyframes rotate {
+  0% { transform: rotateX(0deg) rotateY(0deg); }
+  100% { transform: rotateX(360deg) rotateY(360deg); }
+}
+
+@keyframes slide {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(200%); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 .selector-container {
