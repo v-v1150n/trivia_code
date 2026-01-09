@@ -78,7 +78,7 @@ const showSelector = ref(false)
 
 // 搜尋
 const handleSearch = async (keywords) => {
-  await store.fetchKnowledge(keywords, 3)
+  await store.fetchKnowledge(keywords, 1)
 }
 
 // 下一則

@@ -56,12 +56,12 @@ ${SYSTEM_PROMPT}
     {
       "title": "有趣的標題",
       "category": "🔬科學 / 📜歷史 / 🎭文化 / 🐾動物 / 🌍地理 / 💬語言 / 🍽️飲食 / 💻科技",
-      "content": "冷知識內容，80-120字，輕鬆口語風格",
-      "whyInteresting": "為什麼這個知識很有梗，1-2句話",
-      "icebreaker": "可以直接拿去跟朋友說的開場白",
-      "quiz": "一個可以拿去考朋友的問題",
-      "sourceName": "來源網站名稱",
-      "sourceUrl": "完整可訪問的原始網址"
+      "content": "冷知識內容，50-80字，極度精簡有趣",
+      "whyInteresting": "一句話解釋笑點",
+      "icebreaker": "一句開場白",
+      "quiz": "一個問題",
+      "sourceName": "網站名",
+      "sourceUrl": "URL"
     }
   ]
 }
