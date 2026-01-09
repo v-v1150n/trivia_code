@@ -3,6 +3,7 @@
     <!-- 模式選擇 -->
     <div class="mode-tabs">
       <button 
+        type="button"
         class="tab" 
         :class="{ active: mode === 'trending' }"
         @click="switchMode('trending')"
@@ -10,6 +11,7 @@
         📈 今日熱門
       </button>
       <button 
+        type="button"
         class="tab" 
         :class="{ active: mode === 'custom' }"
         @click="switchMode('custom')"
@@ -27,6 +29,7 @@
       
       <div v-else-if="store.trendingTopics.length" class="topics-grid">
         <button 
+          type="button"
           v-for="(topic, index) in store.trendingTopics" 
           :key="index"
           class="topic-chip"
@@ -38,6 +41,7 @@
       </div>
       
       <button 
+        type="button"
         v-if="!store.isLoading && !store.trendingTopics.length"
         class="btn btn-primary refresh-btn"
         @click="loadTrending"
@@ -56,7 +60,7 @@
           placeholder="輸入關鍵字，多個用空格分隔..."
           @keyup.enter="search"
         />
-        <button class="btn btn-primary search-btn" @click="search">
+        <button type="button" class="btn btn-primary search-btn" @click="search">
           🔍
         </button>
       </div>
@@ -65,6 +69,7 @@
 
     <!-- 搜尋按鈕 -->
     <button 
+      type="button"
       class="btn btn-primary main-search-btn"
       :disabled="store.isLoading || (!selectedTopic && !customKeywords)"
       @click="search"
@@ -75,6 +80,7 @@
 
     <!-- 隨機按鈕 -->
     <button 
+      type="button"
       class="btn btn-secondary random-btn"
       :disabled="store.isLoading"
       @click="randomSearch"
