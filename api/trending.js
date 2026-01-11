@@ -102,16 +102,22 @@ export default async function handler(req, res) {
         const data = safeParseJSON(response.text)
 
         if (data && data.topics) {
-            return res.status(200).json(data)
+            // 去重：移除重複的關鍵字（不區分大小寫）
+            const uniqueTopics = [...new Set(
+                data.topics.map(t => t.trim())
+            )].filter(t => t.length > 0)
+            return res.status(200).json({ topics: uniqueTopics })
         }
 
         // 備用方案：從文字中提取關鍵字
         const text = response.text || ''
         const lines = text.split('\n').filter(l => l.trim())
-        const topics = lines.slice(0, 5).map(l => l.replace(/^[\d\.\-\*]+\s*/, '').trim())
+        const rawTopics = lines.slice(0, 10).map(l => l.replace(/^[\d\.\-\*]+\s*/, '').trim())
+        // 去重
+        const uniqueTopics = [...new Set(rawTopics)].filter(t => t.length > 0)
 
-        if (topics.length > 0) {
-            return res.status(200).json({ topics })
+        if (uniqueTopics.length > 0) {
+            return res.status(200).json({ topics: uniqueTopics })
         }
 
         console.error('Failed to parse trending:', text?.substring(0, 500))
