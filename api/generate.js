@@ -17,6 +17,61 @@ const SYSTEM_PROMPT = `
 - 避免過於沉重或負面的內容
 `
 
+// 重試機制：指數退避
+async function retryWithBackoff(fn, maxRetries = 3, baseDelay = 1000) {
+    let lastError
+    for (let attempt = 0; attempt < maxRetries; attempt++) {
+        try {
+            return await fn()
+        } catch (error) {
+            lastError = error
+            // 若是無法重試的錯誤（如 400），直接拋出
+            if (error.message?.includes('API key') || error.message?.includes('Invalid')) {
+                throw error
+            }
+            // 指數退避延遲
+            const delay = baseDelay * Math.pow(2, attempt)
+            console.log(`Attempt ${attempt + 1} failed, retrying in ${delay}ms...`)
+            await new Promise(resolve => setTimeout(resolve, delay))
+        }
+    }
+    throw lastError
+}
+
+// 安全解析 JSON
+function safeParseJSON(text) {
+    // 清理 markdown code blocks
+    let cleaned = text
+        .replace(/```json\s*/gi, '')
+        .replace(/```\s*/g, '')
+        .trim()
+
+    // 嘗試直接解析
+    try {
+        return JSON.parse(cleaned)
+    } catch (e) {
+        // 嘗試提取 JSON 物件
+        const jsonMatch = cleaned.match(/\{[\s\S]*\}/)
+        if (jsonMatch) {
+            try {
+                return JSON.parse(jsonMatch[0])
+            } catch (e2) {
+                // 嘗試修復常見問題
+                let fixed = jsonMatch[0]
+                    .replace(/,\s*}/g, '}')      // 移除尾部逗號
+                    .replace(/,\s*]/g, ']')     // 移除陣列尾部逗號
+                    .replace(/'/g, '"')         // 單引號轉雙引號
+                try {
+                    return JSON.parse(fixed)
+                } catch (e3) {
+                    return null
+                }
+            }
+        }
+    }
+    return null
+}
+
 export default async function handler(req, res) {
     // 設定 CORS
     res.setHeader('Access-Control-Allow-Origin', '*')
@@ -67,26 +122,28 @@ ${SYSTEM_PROMPT}
 }
 
 重要規則：
-1. 只回傳 JSON，不要其他文字
+1. 只回傳純 JSON，不要包含任何 markdown 格式或其他文字
 2. 內容要真實有趣
 3. 語氣要像在跟朋友聊天
 `
 
-        const response = await ai.models.generateContent({
-            model: 'gemini-2.5-flash',
-            contents: prompt
+        // 使用重試機制呼叫 API
+        const response = await retryWithBackoff(async () => {
+            return await ai.models.generateContent({
+                model: 'gemini-2.5-flash',
+                contents: prompt
+            })
         })
 
-        // 解析 JSON
-        let text = response.text.replace(/```json/g, '').replace(/```/g, '') // Cleanup markdown code blocks if any
+        // 安全解析 JSON
+        const data = safeParseJSON(response.text)
 
-        // 嘗試提取 JSON
-        const jsonMatch = text.match(/\{[\s\S]*\}/)
-        if (jsonMatch) {
-            const data = JSON.parse(jsonMatch[0])
+        if (data && data.knowledge) {
             return res.status(200).json(data)
         }
 
+        // 如果解析失敗，記錄原始回應以便除錯
+        console.error('Failed to parse response:', response.text?.substring(0, 500))
         return res.status(500).json({ error: 'Failed to parse response' })
 
     } catch (error) {
