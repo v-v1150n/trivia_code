@@ -127,11 +127,14 @@ ${SYSTEM_PROMPT}
 3. 語氣要像在跟朋友聊天
 `
 
-        // 使用重試機制呼叫 API
+        // 使用重試機制呼叫 API（含 Google Search grounding）
         const response = await retryWithBackoff(async () => {
             return await ai.models.generateContent({
                 model: 'gemini-2.5-flash',
-                contents: prompt
+                contents: prompt,
+                config: {
+                    tools: [{ googleSearch: {} }]
+                }
             })
         })
 
