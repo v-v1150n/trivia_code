@@ -96,7 +96,30 @@ export default async function handler(req, res) {
 
         const ai = new GoogleGenAI({ apiKey })
 
-        const topicText = keywords ? `關於「${keywords}」的` : '跨領域、跨文化的隨機'
+        // 隨機主題種子 - 當沒有關鍵字時隨機選擇領域
+        const randomCategories = [
+            '動物', '植物', '海洋生物', '昆蟲', '恐龍',
+            '太空', '天文', '物理', '化學', '數學',
+            '歷史', '古文明', '中世紀', '世界大戰',
+            '地理', '國家', '城市', '自然奇觀',
+            '飲食', '料理', '甜點', '飲料',
+            '科技', '發明', '網路', '人工智慧',
+            '語言', '文字', '俚語', '翻譯',
+            '心理學', '人體', '醫學', '睡眠',
+            '藝術', '音樂', '電影', '文學',
+            '運動', '奧運', '極限運動',
+            '經濟', '貨幣', '商業'
+        ]
+
+        let topicText
+        if (keywords) {
+            topicText = `關於「${keywords}」的`
+        } else {
+            // 隨機選擇 1-2 個領域
+            const shuffled = randomCategories.sort(() => Math.random() - 0.5)
+            const picked = shuffled.slice(0, Math.floor(Math.random() * 2) + 1).join('、')
+            topicText = `關於「${picked}」領域的有趣`
+        }
 
         const prompt = `
 ${SYSTEM_PROMPT}
