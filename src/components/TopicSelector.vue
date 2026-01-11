@@ -98,7 +98,7 @@ const emit = defineEmits(['search'])
 
 const store = useKnowledgeStore()
 
-const mode = ref('custom')
+const mode = ref('trending')  // 預設為今日熱門
 const selectedTopic = ref('')
 const customKeywords = ref('')
 
@@ -106,6 +106,13 @@ const customKeywords = ref('')
 const loadTrending = async () => {
   await store.fetchTrendingTopics()
 }
+
+// 初始化時自動載入熱門話題
+onMounted(() => {
+  if (!store.trendingTopics.length) {
+    loadTrending()
+  }
+})
 
 // 選擇話題並直接搜尋
 const selectTopic = (topic) => {
