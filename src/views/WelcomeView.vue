@@ -117,6 +117,10 @@
   filter: blur(80px);
   opacity: 0.4;
   animation: float 10s infinite ease-in-out;
+  /* 效能優化 */
+  transform: translateZ(0);
+  will-change: transform;
+  contain: layout style paint;
 }
 
 .shape-1 {

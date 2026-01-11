@@ -1,7 +1,9 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from './views/HomeView.vue'
-import FavoritesView from './views/FavoritesView.vue'
-import WelcomeView from './views/WelcomeView.vue'
+
+// 路由懶加載 - 減少初始載入體積
+const WelcomeView = () => import('./views/WelcomeView.vue')
+const HomeView = () => import('./views/HomeView.vue')
+const FavoritesView = () => import('./views/FavoritesView.vue')
 
 const routes = [
     {
