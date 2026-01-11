@@ -96,29 +96,48 @@ export default async function handler(req, res) {
 
         const ai = new GoogleGenAI({ apiKey })
 
-        // 隨機主題種子 - 當沒有關鍵字時隨機選擇領域
+        // 隨機主題種子 - 大幅擴充以減少重複
         const randomCategories = [
-            '動物', '植物', '海洋生物', '昆蟲', '恐龍',
-            '太空', '天文', '物理', '化學', '數學',
-            '歷史', '古文明', '中世紀', '世界大戰',
-            '地理', '國家', '城市', '自然奇觀',
-            '飲食', '料理', '甜點', '飲料',
-            '科技', '發明', '網路', '人工智慧',
-            '語言', '文字', '俚語', '翻譯',
-            '心理學', '人體', '醫學', '睡眠',
-            '藝術', '音樂', '電影', '文學',
-            '運動', '奧運', '極限運動',
-            '經濟', '貨幣', '商業'
+            // 動物相關
+            '貓咪', '狗狗', '鳥類', '魚類', '鯊魚', '鯨魚', '海豚', '章魚', '水母',
+            '蜜蜂', '螞蟻', '蝴蝶', '蜘蛛', '蛇', '青蛙', '烏龜', '恐龍', '猛瑪象',
+            // 科學
+            '黑洞', '星球', '銀河系', '外星人', '量子力學', '相對論', '化學反應',
+            'DNA', '細胞', '病毒', '細菌', '疫苗',
+            // 人體
+            '大腦', '心臟', '眼睛', '耳朵', '皮膚', '骨骼', '血液', '睡眠', '夢境',
+            // 歷史
+            '埃及', '羅馬', '希臘', '中國古代', '日本武士', '維京人', '馬雅文明', '印加帝國',
+            '世界大戰', '冷戰', '工業革命', '文藝復興',
+            // 地理
+            '火山', '地震', '海嘯', '極光', '沙漠', '雨林', '北極', '南極', '深海',
+            '喜馬拉雅山', '亞馬遜河', '撒哈拉沙漠',
+            // 飲食
+            '咖啡', '茶葉', '巧克力', '起司', '壽司', '拉麵', '披薩', '漢堡', '冰淇淋',
+            '辣椒', '香料', '發酵食品',
+            // 科技
+            '網際網路', '智慧手機', '電腦', '機器人', '無人機', '電動車', '太空探索',
+            '虛擬實境', '區塊鏈', 'AI人工智慧',
+            // 藝術文化
+            '電影', '音樂', '繪畫', '雕塑', '攝影', '舞蹈', '戲劇', '動漫', '電玩',
+            // 語言文字
+            '中文', '英文', '日文', '表情符號', '密碼學', '手語',
+            // 運動
+            '足球', '籃球', '棒球', '網球', '游泳', '馬拉松', '滑雪', '衝浪', '攀岩',
+            // 其他
+            '數學', '哲學', '心理學', '經濟學', '時尚', '建築', '交通工具', '節日慶典'
         ]
 
         let topicText
         if (keywords) {
             topicText = `關於「${keywords}」的`
         } else {
-            // 隨機選擇 1-2 個領域
-            const shuffled = randomCategories.sort(() => Math.random() - 0.5)
-            const picked = shuffled.slice(0, Math.floor(Math.random() * 2) + 1).join('、')
-            topicText = `關於「${picked}」領域的有趣`
+            // 隨機選擇 1-2 個領域，加入時間戳增加變化
+            const seed = Date.now()
+            const shuffled = randomCategories.sort(() => Math.sin(seed * Math.random()) - 0.5)
+            const numPicks = Math.floor(Math.random() * 2) + 1
+            const picked = shuffled.slice(0, numPicks).join('、')
+            topicText = `關於「${picked}」的獨特且鮮為人知的`
         }
 
         const prompt = `
@@ -153,7 +172,7 @@ ${SYSTEM_PROMPT}
         // 使用重試機制呼叫 API（含 Google Search grounding）
         const response = await retryWithBackoff(async () => {
             return await ai.models.generateContent({
-                model: 'gemini-2.5-flash',
+                model: 'gemini-2.5-pro',
                 contents: prompt,
                 config: {
                     tools: [{ googleSearch: {} }]
