@@ -158,7 +158,7 @@ const handleSearch = async (keywords, type = 'trending') => {
   startLoadingAnimation()
   try {
     store.knowledgeList = [] // 清空舊的
-    await store.fetchKnowledge(keywords, 3) // 確保是 3 則
+    await store.fetchKnowledge(keywords, 5) // 搜尋 5 則
   } finally {
     stopLoadingAnimation()
   }

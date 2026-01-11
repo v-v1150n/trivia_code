@@ -90,7 +90,7 @@ export default async function handler(req, res) {
         // 使用重試機制呼叫 API
         const response = await retryWithBackoff(async () => {
             return await ai.models.generateContent({
-                model: 'gemini-2.5-pro',
+                model: 'gemini-2.0-flash-lite',
                 contents: prompt,
                 config: {
                     tools: [{ googleSearch: {} }]
