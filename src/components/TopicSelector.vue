@@ -207,6 +207,8 @@ const switchMode = (newMode) => {
   display: flex;
   flex-wrap: wrap;
   gap: var(--spacing-sm);
+  justify-content: center;
+  margin-bottom: var(--spacing-md);
 }
 
 .topic-chip {
@@ -223,6 +225,7 @@ const switchMode = (newMode) => {
 .topic-chip:hover {
   background: var(--bg-card-hover);
   border-color: var(--primary);
+  transform: translateY(-2px);
 }
 
 .topic-chip.selected {
@@ -232,7 +235,17 @@ const switchMode = (newMode) => {
 }
 
 .refresh-btn {
-  width: 100%;
+  width: auto;
+  padding: var(--spacing-xs) var(--spacing-md);
+  font-size: 12px;
+  margin: 0 auto;
+  display: block;
+  opacity: 0.7;
+  transition: opacity var(--transition-fast);
+}
+
+.refresh-btn:hover {
+  opacity: 1;
 }
 
 .input-wrapper {
