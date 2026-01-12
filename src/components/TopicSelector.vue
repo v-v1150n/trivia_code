@@ -27,27 +27,29 @@
         <span>搜尋熱門話題中...</span>
       </div>
       
-      <div v-else-if="store.trendingTopics.length" class="topics-grid">
+      <template v-else>
+        <div v-if="store.trendingTopics.length" class="topics-grid">
+          <button 
+            type="button"
+            v-for="(topic, index) in store.trendingTopics" 
+            :key="index"
+            class="topic-chip"
+            :class="{ selected: selectedTopic === topic }"
+            @click="selectTopic(topic)"
+          >
+            {{ topic }}
+          </button>
+        </div>
+        
+        <!-- 刷新按鈕 - 永遠可見 -->
         <button 
           type="button"
-          v-for="(topic, index) in store.trendingTopics" 
-          :key="index"
-          class="topic-chip"
-          :class="{ selected: selectedTopic === topic }"
-          @click="selectTopic(topic)"
+          class="btn btn-secondary refresh-btn"
+          @click="refreshTrending"
         >
-          {{ topic }}
+          🔄 重新搜尋熱門話題
         </button>
-      </div>
-      
-      <button 
-        type="button"
-        v-if="!store.isLoading && !store.trendingTopics.length"
-        class="btn btn-primary refresh-btn"
-        @click="loadTrending"
-      >
-        🔄 載入熱門話題
-      </button>
+      </template>
     </div>
 
     <!-- 自訂關鍵字 -->
@@ -104,6 +106,12 @@ const customKeywords = ref('')
 
 // 載入熱門話題
 const loadTrending = async () => {
+  await store.fetchTrendingTopics()
+}
+
+// 手動刷新熱門話題
+const refreshTrending = async () => {
+  store.trendingTopics = []  // 清空現有話題
   await store.fetchTrendingTopics()
 }
 
